@@ -7,11 +7,15 @@ import { makeQuestion } from 'test/factories/make-question'
 import { NotAllowedError } from './errors/not-allowed-error'
 import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository'
 import { InMemoryQuestionAttachmentsRepository } from 'test/repositories/in-memory-question-attachments-repository'
+import { InMemoryAttachmentsRepository } from 'test/repositories/in-memory-attachments-repository'
+import { InMemoryStudentsRepository } from 'test/repositories/in-memory-students-repository'
 
 let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
+let inMemoryQuestionsRepository: InMemoryQuestionsRepository
 let inMemoryAnswersRepository: InMemoryAnswersRepository
-let inMemoryQuestionRepository: InMemoryQuestionsRepository
+let inMemoryAttachmentsRepository: InMemoryAttachmentsRepository
+let inMemoryStudentsRepository: InMemoryStudentsRepository
 let sut: ChooseQuestionBestAnswerUseCase
 
 describe('Choose Question Best Answer', () => {
@@ -21,12 +25,16 @@ describe('Choose Question Best Answer', () => {
     inMemoryAnswersRepository = new InMemoryAnswersRepository(
       inMemoryAnswerAttachmentsRepository,
     )
-    inMemoryQuestionRepository = new InMemoryQuestionsRepository(
+    inMemoryAttachmentsRepository = new InMemoryAttachmentsRepository()
+    inMemoryStudentsRepository = new InMemoryStudentsRepository()
+    inMemoryQuestionsRepository = new InMemoryQuestionsRepository(
       inMemoryQuestionAttachmentsRepository,
+      inMemoryAttachmentsRepository,
+      inMemoryStudentsRepository,
     )
     sut = new ChooseQuestionBestAnswerUseCase(
       inMemoryAnswersRepository,
-      inMemoryQuestionRepository,
+      inMemoryQuestionsRepository,
     )
   })
   it('should be able to choose the question best answer', async () => {
@@ -34,13 +42,13 @@ describe('Choose Question Best Answer', () => {
     const answer = makeAnswer({
       questionId: question.id,
     })
-    await inMemoryQuestionRepository.create(question)
+    await inMemoryQuestionsRepository.create(question)
     await inMemoryAnswersRepository.create(answer)
     await sut.execute({
       answerId: answer.id.toString(),
       authorId: question.authorId.toString(),
     })
-    expect(inMemoryQuestionRepository.items[0].bestAnswerId).toEqual(answer.id)
+    expect(inMemoryQuestionsRepository.items[0].bestAnswerId).toEqual(answer.id)
   })
   it('should not be able to choose another user question best answer', async () => {
     const question = makeQuestion({
@@ -49,7 +57,7 @@ describe('Choose Question Best Answer', () => {
     const answer = makeAnswer({
       questionId: question.id,
     })
-    await inMemoryQuestionRepository.create(question)
+    await inMemoryQuestionsRepository.create(question)
     await inMemoryAnswersRepository.create(answer)
     const result = await sut.execute({
       answerId: answer.id.toString(),

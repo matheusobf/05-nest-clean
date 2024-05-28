@@ -6,6 +6,13 @@ export class InMemoryQuestionAttachmentsRepository
 {
   public items: QuestionAttachment[] = []
 
+  async findManyByQuestionId(questionId: string) {
+    const questionAttachments = this.items.filter(
+      (item) => item.questionId.toString() === questionId,
+    )
+    return questionAttachments
+  }
+
   async createMany(attachments: QuestionAttachment[]): Promise<void> {
     this.items.push(...attachments)
   }
@@ -15,13 +22,6 @@ export class InMemoryQuestionAttachmentsRepository
       return !attachments.some((attachment) => attachment.equals(item))
     })
     this.items = questionAttachments
-  }
-
-  async findManyByQuestionId(questionId: string) {
-    const questionAttachments = this.items.filter(
-      (item) => item.questionId.toString() === questionId,
-    )
-    return questionAttachments
   }
 
   async deleteManyByQuestionId(questionId: string) {

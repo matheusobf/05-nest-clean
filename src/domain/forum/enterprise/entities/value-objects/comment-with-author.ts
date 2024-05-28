@@ -11,28 +11,28 @@ export interface CommentWithAuthorProps {
 }
 
 export class CommentWithAuthor extends ValueObject<CommentWithAuthorProps> {
-  get commentId(): string {
+  get commentId() {
     return this.props.commentId
   }
 
-  get content(): string {
+  get content() {
     return this.props.content
   }
 
-  get authorId(): string {
+  get authorId() {
     return this.props.authorId
   }
 
-  get author(): string {
+  get author() {
     return this.props.author
   }
 
-  get createdAt(): Date {
+  get createdAt() {
     return this.props.createdAt
   }
 
-  get updatedAt(): Date | null {
-    return this.props.updatedAt || null
+  get updatedAt() {
+    return this.props.updatedAt
   }
 
   static create(props: CommentWithAuthorProps) {
