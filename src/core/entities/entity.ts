@@ -19,5 +19,6 @@ export abstract class Entity<Props> {
     if (entity.id === this._id) {
       return true
     }
+    return false
   }
 }
